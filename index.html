@@ -122,7 +122,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC','Noto San
   <div class="tabs" id="stabs"></div>
   <div id="scont"></div>
 </div>
-<div class="ov" id="bov"><div class="oi" id="boi"></div><div class="ot">BADGE GET!</div><div class="on" id="bon"></div><button class="btn" style="margin-top:24px" onclick="dov()">OK!</button></div>
+<div class="ov" id="bov"><div class="oi" id="boi"></div><div class="ot">BADGE GET!</div><div class="on" id="bon"></div><div id="bcode" style="display:none;margin-top:16px;padding:12px 20px;background:var(--bg2);border:2px dashed var(--accent);border-radius:8px;text-align:center"><div style="font-size:10px;color:var(--dim);font-family:'Press Start 2P',monospace;margin-bottom:6px">PROGRESS CODE</div><div id="bcodeval" style="font-family:'Press Start 2P',monospace;font-size:20px;color:var(--accent);letter-spacing:4px;user-select:all;cursor:pointer" onclick="navigator.clipboard.writeText(this.textContent).then(()=>{this.style.color='var(--grass)';setTimeout(()=>this.style.color='var(--accent)',1000)})"></div><div style="font-size:11px;color:var(--dim);margin-top:6px">撳 code 複製 · 貼去 Claude Code 同步</div></div><button class="btn" style="margin-top:16px" onclick="dov()">OK!</button></div>
 
 <script>
 // ===== 62 VERBS =====
@@ -584,7 +584,8 @@ function rGate(e){
   e.innerHTML=`<div class="gate"><div class="gi">${pass?cb.badge:'🔒'}</div><div class="gt">${pass?'BATCH CLEAR!':'TRY AGAIN'}</div><div class="gs">${s} / ${t} (${pct}%)</div><div style="font-size:13px;color:var(--dim);margin-bottom:16px">${pass?(already?'你已經攞咗呢個徽章！':'恭喜！你獲得了'+cb.bn+'！'):(cb.id===0?'分類要90%先通關——返去溫理論再嚟！':'要答啱60%先通關。返去溫理論再嚟！')}</div>${pass&&!already?`<button class="btn" onclick="claim(${cb.id})">攞取徽章！</button>`:''}${pass&&already?`<button class="btn" onclick="goMap()">返回地圖</button>`:''}${!pass?`<div style="display:flex;gap:8px;justify-content:center"><button class="btn" onclick="retry()">再嚟過</button><button class="btn btn-g" onclick="sw(0)">返去溫理論</button></div>`:''}</div>`;
 }
 function retry(){ds={ans:{},sc:0,vi:0,vs:sh([...V]).slice(0,10)};sw(1)}
-function claim(id){const p=lp();if(!p.b[id])p.b[id]={};p.b[id].d=true;p.b[id].dt=new Date().toISOString().slice(0,10);if(id>=p.c)p.c=id+1;sp(p);document.getElementById('boi').textContent=cb.badge;document.getElementById('bon').textContent=cb.bn;document.getElementById('bov').classList.add('show')}
+function genCode(){const c='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s}
+function claim(id){const p=lp();if(!p.b[id])p.b[id]={};p.b[id].d=true;p.b[id].dt=new Date().toISOString().slice(0,10);const code=genCode();p.b[id].code=code;if(id>=p.c)p.c=id+1;sp(p);document.getElementById('boi').textContent=cb.badge;document.getElementById('bon').textContent=cb.bn;document.getElementById('bcodeval').textContent=code;document.getElementById('bcode').style.display='block';document.getElementById('bov').classList.add('show')}
 function dov(){document.getElementById('bov').classList.remove('show');goMap()}
 function sh(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a}
 
