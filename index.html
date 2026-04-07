@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>JPN* 動詞修行</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap');
+:root{--bg:#1a1c2c;--bg2:#262b44;--card:#2a2f4a;--text:#f4f4f4;--dim:#8b8d9a;--accent:#ffcd75;--fire:#e8524a;--water:#5fcde4;--grass:#38b764;--electric:#ffcd75;--psychic:#d77bba;--ground:#c28569;--steel:#68a0b4;--ice:#73eff7;--path:#3a4066;--locked:#333652;--r:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC','Noto Sans JP',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+.pf{font-family:'Press Start 2P',monospace}
+.card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;border:1px solid var(--bg2)}
+.btn{display:inline-block;background:var(--accent);color:var(--bg);border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center}
+.btn:disabled{opacity:.3;cursor:default}
+.btn-g{background:var(--card);color:var(--text);border:2px solid var(--bg2)}
+.formula{background:var(--bg);border-radius:8px;padding:14px 16px;font-size:15px;font-weight:700;text-align:center;border:1px dashed var(--accent);margin:12px 0;line-height:1.8}
+.expl{background:linear-gradient(135deg,#2d1b4e,#1a1c2c);border-radius:8px;padding:14px 16px;border-left:3px solid var(--psychic);margin:12px 0;font-size:14px;line-height:1.8}
+.eg{background:var(--bg2);border-radius:8px;padding:12px 16px;margin:8px 0}
+.eg .jp{font-size:16px;font-weight:700;margin-bottom:4px}
+.eg .cn{font-size:13px;color:var(--dim)}
+.pit{background:linear-gradient(135deg,#2c1a1a,#1a1c2c);border-radius:8px;padding:14px 16px;border-left:3px solid var(--fire);margin:12px 0}
+.pit-l{font-size:10px;color:var(--fire);font-family:'Press Start 2P',monospace;margin-bottom:6px}
+.pit-r{display:flex;gap:8px;margin-top:8px}
+.pit-w,.pit-c{flex:1;padding:8px;border-radius:6px;font-size:13px;text-align:center}
+.pit-w{background:rgba(232,82,74,.15);color:var(--fire)}
+.pit-c{background:rgba(56,183,100,.15);color:var(--grass)}
+.tag{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--bg2);color:var(--dim);display:inline-block;margin:2px}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+.tbl th{background:var(--bg2);padding:8px;text-align:left;font-size:11px;color:var(--accent)}
+.tbl td{padding:8px;border-bottom:1px solid var(--bg2)}
+.tbl tr:last-child td{border:none}
+
+/* Map */
+#map{padding:20px 16px 100px;max-width:480px;margin:0 auto}
+.mh{text-align:center;padding:24px 0 8px}
+.mh h1{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--accent);text-shadow:2px 2px 0 #b57614;line-height:1.6}
+.mh .sub{font-size:12px;color:var(--dim);margin-top:12px}
+.trainer{background:var(--card);border:2px solid var(--accent);border-radius:var(--r);padding:16px;margin:16px 0 24px;display:flex;align-items:center;gap:16px}
+.av{width:56px;height:56px;background:var(--bg2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid var(--accent);flex-shrink:0}
+.tinfo{flex:1}
+.tinfo .nm{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--accent)}
+.tinfo .lv{font-size:12px;color:var(--dim);margin-top:4px}
+.xpb{height:8px;background:var(--bg);border-radius:4px;margin-top:8px;overflow:hidden}
+.xpf{height:100%;background:linear-gradient(90deg,var(--grass),var(--water));border-radius:4px;transition:width .5s}
+.badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:0 0 20px}
+.mb{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;transition:.3s}
+.mb.on{border:2px solid var(--accent);box-shadow:0 0 8px rgba(255,205,117,.4)}
+.mb.off{border:2px solid var(--locked);opacity:.3;filter:grayscale(1)}
+.phase-label{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--dim);padding:16px 0 8px;text-align:center}
+.route{position:relative;padding-left:40px}
+.route::before{content:'';position:absolute;left:19px;top:0;bottom:0;width:4px;background:repeating-linear-gradient(180deg,var(--path) 0,var(--path) 8px,transparent 8px,transparent 12px)}
+.node{position:relative;margin-bottom:16px;cursor:pointer;transition:transform .2s}
+.node:active{transform:scale(.97)}
+.dot{position:absolute;left:-40px;top:14px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;z-index:1}
+.dot.done{background:var(--grass);border:3px solid #2a9d4e}
+.dot.cur{background:var(--electric);border:3px solid #b57614;animation:pulse 2s infinite}
+.dot.lock{background:var(--locked);border:3px solid #444}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,205,117,.6)}50%{box-shadow:0 0 0 10px rgba(255,205,117,0)}}
+.sc{background:var(--card);border-radius:var(--r);padding:14px;border-left:4px solid var(--locked);transition:.3s}
+.sc.done{border-left-color:var(--grass)}.sc.cur{border-left-color:var(--electric);box-shadow:0 0 20px rgba(255,205,117,.1)}.sc.lock{opacity:.5}
+.sc .sn{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--dim)}
+.sc .st{font-size:16px;font-weight:700;margin:4px 0}
+.sc .ss{font-size:12px;color:var(--dim);margin-bottom:6px}
+.sp{margin-top:8px;height:4px;background:var(--bg);border-radius:2px;overflow:hidden}
+.spf{height:100%;border-radius:2px;transition:width .5s}
+
+/* Stage */
+#stg{display:none;max-width:480px;margin:0 auto;padding:0 16px 100px}
+.sh{position:sticky;top:0;z-index:10;background:var(--bg);padding:12px 0;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--bg2)}
+.bk{background:var(--card);border:none;color:var(--text);width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.tabs{display:flex;gap:4px;margin:16px 0;overflow-x:auto}
+.tab{font-size:11px;padding:6px 12px;border-radius:16px;background:var(--card);color:var(--dim);border:none;cursor:pointer;white-space:nowrap;transition:.2s}
+.tab.act{background:var(--electric);color:var(--bg);font-weight:700}
+.tab.dn{background:transparent;color:var(--grass);border:1px solid var(--grass)}
+
+/* Drill */
+.dv{text-align:center;margin:20px 0}
+.dv .dk{font-size:36px;font-weight:700;margin:8px 0}
+.dv .di{font-size:16px;color:var(--dim)}
+.dv .ds{margin-top:8px;font-size:12px;color:var(--accent)}
+.dg{display:grid;gap:8px}
+.dq{padding:12px}
+.dql{font-size:12px;color:var(--water);margin-bottom:8px}
+.do{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dob{padding:10px 8px;background:var(--bg2);border:2px solid var(--bg2);border-radius:6px;color:var(--text);font-size:14px;cursor:pointer;font-family:inherit;text-align:center;transition:.2s}
+.dob:active{transform:scale(.98)}
+.dob.ok{border-color:var(--grass);background:rgba(56,183,100,.15);color:var(--grass)}
+.dob.no{border-color:var(--fire);background:rgba(232,82,74,.1);color:var(--fire)}
+.da{font-size:16px;font-weight:700;margin-top:4px}
+.dfb{margin-top:8px;padding:10px;border-radius:6px;font-size:12px;line-height:1.6;display:none}
+.dfb.show{display:block}
+.dfb.fbok{background:rgba(56,183,100,.1);color:var(--grass)}
+.dfb.fbno{background:rgba(232,82,74,.1);color:var(--fire)}
+
+/* Gate */
+.gate{background:linear-gradient(135deg,var(--card),var(--bg2));border:2px solid var(--accent);border-radius:var(--r);padding:24px;text-align:center;margin:20px 0}
+.gate .gi{font-size:48px;margin-bottom:12px}
+.gate .gt{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--accent);margin-bottom:8px}
+.gate .gs{font-family:'Press Start 2P',monospace;font-size:20px;color:var(--electric);margin:16px 0}
+
+/* Overlay */
+.ov{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:100;align-items:center;justify-content:center;flex-direction:column}
+.ov.show{display:flex}
+.ov .oi{font-size:80px;animation:bb .6s ease}
+.ov .ot{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--accent);margin-top:16px;text-shadow:2px 2px 0 #b57614}
+.ov .on{font-size:18px;font-weight:700;margin-top:8px}
+@keyframes bb{0%{transform:scale(0);opacity:0}60%{transform:scale(1.3)}100%{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+<div id="map">
+  <div class="mh"><h1>JPN* 動詞修行</h1><div class="sub">10 Batches · 31 Forms · 62 Verbs</div></div>
+  <div class="trainer"><div class="av">S</div><div class="tinfo"><div class="nm">SIUMING</div><div class="lv">Lv.<span id="tlv">1</span> · <span id="tbd">0</span>/10 Badges</div><div class="xpb"><div class="xpf" id="txp" style="width:0%"></div></div></div></div>
+  <div class="badges" id="bdg"></div>
+  <div id="rt"></div>
+</div>
+<div id="stg">
+  <div class="sh"><button class="bk" onclick="goMap()">&#8592;</button><div class="pf" style="font-size:10px" id="stitle"></div></div>
+  <div class="tabs" id="stabs"></div>
+  <div id="scont"></div>
+</div>
+<div class="ov" id="bov"><div class="oi" id="boi"></div><div class="ot">BADGE GET!</div><div class="on" id="bon"></div><button class="btn" style="margin-top:24px" onclick="dov()">OK!</button></div>
+
+<script>
+// ===== 62 VERBS =====
+const V=[
+{k:"着る",r:"きる",c:2,m:"著(衫)"},{k:"治る",r:"なおる",c:1,m:"康復"},{k:"直す",r:"なおす",c:1,m:"修好"},
+{k:"もらう",r:"もらう",c:1,m:"收到"},{k:"出る",r:"でる",c:2,m:"出去"},{k:"寝る",r:"ねる",c:2,m:"瞓覺"},
+{k:"教える",r:"おしえる",c:2,m:"教"},{k:"売る",r:"うる",c:1,m:"賣"},{k:"あげる",r:"あげる",c:2,m:"送畀"},
+{k:"考える",r:"かんがえる",c:2,m:"諗"},{k:"空く",r:"あく",c:1,m:"空出嚟"},{k:"終わる",r:"おわる",c:1,m:"完"},
+{k:"並ぶ",r:"ならぶ",c:1,m:"排隊"},{k:"頼む",r:"たのむ",c:1,m:"拜託"},{k:"言う",r:"いう",c:1,m:"講"},
+{k:"届く",r:"とどく",c:1,m:"送到"},{k:"聞く",r:"きく",c:1,m:"聽/問"},{k:"咲く",r:"さく",c:1,m:"開花"},
+{k:"休む",r:"やすむ",c:1,m:"休息"},{k:"覚える",r:"おぼえる",c:2,m:"記住"},{k:"泊まる",r:"とまる",c:1,m:"住宿"},
+{k:"かかる",r:"かかる",c:1,m:"花費"},{k:"入る",r:"はいる",c:1,m:"入去"},{k:"くれる",r:"くれる",c:2,m:"畀(我)"},
+{k:"集める",r:"あつめる",c:2,m:"收集"},{k:"なる",r:"なる",c:1,m:"變成"},{k:"見送る",r:"みおくる",c:1,m:"送行"},
+{k:"違う",r:"ちがう",c:1,m:"唔同"},{k:"送る",r:"おくる",c:1,m:"寄/送"},{k:"持つ",r:"もつ",c:1,m:"拿"},
+{k:"決める",r:"きめる",c:2,m:"決定"},{k:"我慢する",r:"がまんする",c:3,m:"忍耐"},{k:"会う",r:"あう",c:1,m:"見面"},
+{k:"来る",r:"くる",c:3,m:"嚟"},{k:"怒る",r:"おこる",c:1,m:"嬲"},{k:"作る",r:"つくる",c:1,m:"整/做"},
+{k:"履く",r:"はく",c:1,m:"著(褲鞋)"},{k:"選ぶ",r:"えらぶ",c:1,m:"揀"},
+{k:"買う",r:"かう",c:1,m:"買"},{k:"読む",r:"よむ",c:1,m:"讀/睇"},
+{k:"帰る",r:"かえる",c:1,m:"返去"},{k:"遊ぶ",r:"あそぶ",c:1,m:"玩"},
+{k:"座る",r:"すわる",c:1,m:"坐"},{k:"住む",r:"すむ",c:1,m:"住"},
+{k:"切る",r:"きる",c:1,m:"切/剪"},{k:"書く",r:"かく",c:1,m:"寫"},
+{k:"待つ",r:"まつ",c:1,m:"等"},{k:"洗う",r:"あらう",c:1,m:"洗"},
+{k:"飛ぶ",r:"とぶ",c:1,m:"飛"},{k:"降る",r:"ふる",c:1,m:"落(雨/雪)"},
+{k:"流行る",r:"はやる",c:1,m:"流行"},{k:"話す",r:"はなす",c:1,m:"傾偈"},
+{k:"忘れる",r:"わすれる",c:2,m:"忘記"},{k:"入れる",r:"いれる",c:2,m:"放入"},
+{k:"見る",r:"みる",c:2,m:"睇"},{k:"食べる",r:"たべる",c:2,m:"食"},
+{k:"起きる",r:"おきる",c:2,m:"起身"},{k:"浴びる",r:"あびる",c:2,m:"沖(涼)"},
+{k:"する",r:"する",c:3,m:"做"},{k:"勉強する",r:"べんきょうする",c:3,m:"讀書/溫書"},
+{k:"運動する",r:"うんどうする",c:3,m:"做運動"},{k:"料理する",r:"りょうりする",c:3,m:"煮嘢食"}
+];
+const CLS_NAME={1:'第1類（う動詞）',2:'第2類（る動詞）',3:'第3類（不規則）'};
+const CLS_SHORT={1:'第1類',2:'第2類',3:'第3類'};
+
+// ===== CONJUGATION ENGINE =====
+function cj(v){
+  const r=v.r,b={};
+  if(v.c===2){const s=r.slice(0,-1);b.nai=s+'ない';b.ta=s+'た';b.te=s+'て';b.kan=s+'られる';b.iko=s+'よう';b.tai=s+'たい';b.sug=s+'すぎる';b.iS=s;}
+  else if(v.c===3){
+    if(r==='する'||r.endsWith('する')){const p=r.slice(0,-2);b.nai=p+'しない';b.ta=p+'した';b.te=p+'して';b.kan=p+'できる';b.iko=p+'しよう';b.tai=p+'したい';b.sug=p+'しすぎる';b.iS=p+'し';}
+    else{b.nai='こない';b.ta='きた';b.te='きて';b.kan='こられる';b.iko='こよう';b.tai='きたい';b.sug='きすぎる';b.iS='き';}
+  }else{
+    const s=r.slice(0,-1),t=r.slice(-1);
+    const A={'う':'わ','く':'か','ぐ':'が','す':'さ','つ':'た','ぬ':'な','ぶ':'ば','む':'ま','る':'ら'};
+    const I={'う':'い','く':'き','ぐ':'ぎ','す':'し','つ':'ち','ぬ':'に','ぶ':'び','む':'み','る':'り'};
+    const E={'う':'え','く':'け','ぐ':'げ','す':'せ','つ':'て','ぬ':'ね','ぶ':'べ','む':'め','る':'れ'};
+    const O={'う':'お','く':'こ','ぐ':'ご','す':'そ','つ':'と','ぬ':'の','ぶ':'ぼ','む':'も','る':'ろ'};
+    const TE={'む':'んで','ぶ':'んで','ぬ':'んで','く':'いて','ぐ':'いで','す':'して','つ':'って','る':'って','う':'って'};
+    const TA={'む':'んだ','ぶ':'んだ','ぬ':'んだ','く':'いた','ぐ':'いだ','す':'した','つ':'った','る':'った','う':'った'};
+    b.nai=s+A[t]+'ない';b.kan=s+E[t]+'る';b.iko=s+O[t]+'う';b.tai=s+I[t]+'たい';b.sug=s+I[t]+'すぎる';b.iS=s+I[t];
+    if(r==='いく'||v.k==='行く'){b.te=s+'って';b.ta=s+'った';}else{b.te=s+TE[t];b.ta=s+TA[t];}
+  }
+  const ns=b.nai.slice(0,-1);
+  return{nai:b.nai,ta:b.ta,te:b.te,
+    teiru:b.te+'いる',teinai:b.te+'いない',tekuda:b.te+'ください',temiru:b.te+'みる',
+    temo:b.te+'も',temoii:b.te+'もいい',tehaik:b.te+'はいけない',
+    tekure:b.te+'くれる',teage:b.te+'あげる',temora:b.te+'もらう',
+    takoto:b.ta+'ことがある',takonai:b.ta+'ことがない',tabaka:b.ta+'ばかり',
+    taato:b.ta+'後で',tara:b.ta+'ら',tari:b.ta+'り',
+    naide:b.nai+'で',naideku:b.nai+'でください',naitoi:b.nai+'といけない',nakuii:ns+'くてもいい',
+    kan:b.kan,iko:b.iko,tai:b.tai,
+    sug:b.sug,niiku:b.iS+'に行く',tame:r+'ために',kamo:r+'かもしれない',sou:b.iS+'そう'
+  };
+}
+
+// Five-finger row data for Batch 1
+function fiveRows(v){
+  if(v.c!==1)return null;
+  const s=v.r.slice(0,-1),t=v.r.slice(-1);
+  const rows={'う':['あ','い','う','え','お'],'く':['か','き','く','け','こ'],'ぐ':['が','ぎ','ぐ','げ','ご'],'す':['さ','し','す','せ','そ'],'つ':['た','ち','つ','て','と'],'ぬ':['な','に','ぬ','ね','の'],'ぶ':['ば','び','ぶ','べ','ぼ'],'む':['ま','み','む','め','も'],'る':['ら','り','る','れ','ろ']};
+  const r=rows[t];
+  return r?{a:s+r[0],i:s+r[1],u:s+r[2],e:s+r[3],o:s+r[4]}:null;
+}
+
+// ===== FORM LABELS =====
+const FL={
+  nai:{j:'ない形',c:'唔做',e:"don't"},ta:{j:'た形',c:'做咗',e:'did'},te:{j:'て形',c:'連接',e:'and'},
+  teiru:{j:'ている',c:'做緊',e:'doing'},teinai:{j:'ていない',c:'未做',e:'not yet'},
+  tekuda:{j:'てください',c:'請做',e:'please do'},temiru:{j:'てみる',c:'試下',e:'try'},
+  temo:{j:'ても',c:'就算',e:'even if'},temoii:{j:'てもいい',c:'可以',e:'may'},
+  tehaik:{j:'てはいけない',c:'唔准',e:'must not'},
+  tekure:{j:'てくれる',c:'幫我做',e:'do for me'},teage:{j:'てあげる',c:'幫人做',e:'do for sb'},
+  temora:{j:'てもらう',c:'請人做',e:'have sb do'},
+  takoto:{j:'たことがある',c:'做過',e:'done before'},takonai:{j:'たことがない',c:'未做過',e:'never done'},
+  tabaka:{j:'たばかり',c:'剛做完',e:'just did'},taato:{j:'た後で',c:'之後',e:'after'},
+  tara:{j:'たら',c:'如果',e:'if'},tari:{j:'たり',c:'做吓',e:'like~'},
+  naide:{j:'ないで',c:'唔做咁',e:'without'},naideku:{j:'ないでください',c:'請唔好',e:"pls don't"},
+  naitoi:{j:'ないといけない',c:'一定要',e:'must'},nakuii:{j:'なくてもいい',c:'唔洗',e:"don't have to"},
+  kan:{j:'可能形',c:'做到',e:'can do'},iko:{j:'意向形',c:'一齊',e:"let's"},tai:{j:'たい形',c:'想做',e:'want to'},
+  sug:{j:'すぎる',c:'太過',e:'too much'},niiku:{j:'に行く',c:'去做',e:'go to do'},
+  tame:{j:'ために',c:'為咗',e:'in order to'},kamo:{j:'かもしれない',c:'可能',e:'might'},
+  sou:{j:'そう',c:'睇落',e:'looks like'}
+};
+
+// ===== 10 BATCHES =====
+const B=[
+// === Batch 0: Classification ===
+{id:0,nm:"動詞三大類",sub:"第1類・第2類・第3類 — 識分先識變",badge:"📖",bn:"分類徽章",col:"var(--steel)",
+ forms:['_cls','_reading'],drillType:'classify',
+ theory:[
+  {nm:"日文動詞得三類",
+   formula:"第1類（う動詞/五段）：字尾係う段\n第2類（る動詞/一段）：字尾 〜える 或 〜いる\n第3類（不規則）：する・来る（得兩個）",
+   ex:"日文動詞唔似英文有幾百種不規則。日文得三類，規則好清晰：<br><br><b>第1類（40個）</b>——最多最複雜，但有規律（五指口訣）：<table class='tbl'><tr><th>漢字</th><th>讀音</th><th>粵語</th></tr><tr><td>飲む</td><td>のむ</td><td>飲</td></tr><tr><td>書く</td><td>かく</td><td>寫</td></tr><tr><td>話す</td><td>はなす</td><td>傾偈</td></tr><tr><td>待つ</td><td>まつ</td><td>等</td></tr><tr><td>買う</td><td>かう</td><td>買</td></tr><tr><td>遊ぶ</td><td>あそぶ</td><td>玩</td></tr><tr><td>帰る</td><td>かえる</td><td>返去</td></tr><tr><td>座る</td><td>すわる</td><td>坐</td></tr><tr><td>洗う</td><td>あらう</td><td>洗</td></tr><tr><td>読む</td><td>よむ</td><td>讀/睇</td></tr><tr><td>住む</td><td>すむ</td><td>住</td></tr><tr><td>切る</td><td>きる</td><td>切/剪</td></tr><tr><td>降る</td><td>ふる</td><td>落(雨)</td></tr><tr><td>飛ぶ</td><td>とぶ</td><td>飛</td></tr></table><br><b>第2類（16個）</b>——去る加新尾巴就搞掂：<table class='tbl'><tr><th>漢字</th><th>讀音</th><th>粵語</th></tr><tr><td>食べる</td><td>たべる</td><td>食</td></tr><tr><td>見る</td><td>みる</td><td>睇</td></tr><tr><td>寝る</td><td>ねる</td><td>瞓覺</td></tr><tr><td>起きる</td><td>おきる</td><td>起身</td></tr><tr><td>教える</td><td>おしえる</td><td>教</td></tr><tr><td>忘れる</td><td>わすれる</td><td>忘記</td></tr><tr><td>覚える</td><td>おぼえる</td><td>記住</td></tr><tr><td>入れる</td><td>いれる</td><td>放入</td></tr><tr><td>着る</td><td>きる</td><td>著(衫)</td></tr><tr><td>浴びる</td><td>あびる</td><td>沖(涼)</td></tr><tr><td>出る</td><td>でる</td><td>出去</td></tr><tr><td>決める</td><td>きめる</td><td>決定</td></tr><tr><td>集める</td><td>あつめる</td><td>收集</td></tr><tr><td>考える</td><td>かんがえる</td><td>諗</td></tr></table><br><b>第3類（6個）</b>——する同来る，死記就得：<table class='tbl'><tr><th>漢字</th><th>讀音</th><th>粵語</th></tr><tr><td>する</td><td>する</td><td>做</td></tr><tr><td>勉強する</td><td>べんきょうする</td><td>讀書</td></tr><tr><td>運動する</td><td>うんどうする</td><td>做運動</td></tr><tr><td>料理する</td><td>りょうりする</td><td>煮嘢食</td></tr><tr><td>我慢する</td><td>がまんする</td><td>忍耐</td></tr><tr><td>来る</td><td>くる</td><td>嚟</td></tr></table>",
+   jp:"飲む（第1類）・食べる（第2類）・する（第3類）",cn:"62個動詞：40 + 16 + 6",
+   pit:"字尾る嘅動詞全部當第2類",pw:"帰る → 帰ない ✗",pr:"帰る → 帰らない（第1類！）"},
+  {nm:"點分第1類 vs 第2類？",
+   formula:"字尾〜える / 〜いる → 多數第2類 ✅\n字尾〜ある / 〜うる / 〜おる → 第1類 ⚠️",
+   ex:"最容易搞混嘅就係「る」結尾嘅動詞。<br><br>✅ <b>第2類（真る動詞）</b>——去る加尾巴：<table class='tbl'><tr><th>漢字</th><th>讀音</th><th>粵語</th></tr><tr><td>食べる</td><td>たべる</td><td>食</td></tr><tr><td>見る</td><td>みる</td><td>睇</td></tr><tr><td>寝る</td><td>ねる</td><td>瞓覺</td></tr><tr><td>起きる</td><td>おきる</td><td>起身</td></tr><tr><td>教える</td><td>おしえる</td><td>教</td></tr><tr><td>忘れる</td><td>わすれる</td><td>忘記</td></tr><tr><td>着る</td><td>きる</td><td>著(衫)</td></tr><tr><td>浴びる</td><td>あびる</td><td>沖(涼)</td></tr></table><br>⚠️ <b>第1類（假る動詞 = 陷阱！）</b>——要用五指口訣：<table class='tbl'><tr><th>🪤 漢字</th><th>讀音</th><th>粵語</th><th>ない形</th></tr><tr><td>入る</td><td>はいる</td><td>入去</td><td>入<b>ら</b>ない</td></tr><tr><td>帰る</td><td>かえる</td><td>返去</td><td>帰<b>ら</b>ない</td></tr><tr><td>走る</td><td>はしる</td><td>跑</td><td>走<b>ら</b>ない</td></tr><tr><td>切る</td><td>きる</td><td>切/剪</td><td>切<b>ら</b>ない</td></tr><tr><td>知る</td><td>しる</td><td>知道</td><td>知<b>ら</b>ない</td></tr><tr><td>売る</td><td>うる</td><td>賣</td><td>売<b>ら</b>ない</td></tr><tr><td>座る</td><td>すわる</td><td>坐</td><td>座<b>ら</b>ない</td></tr><tr><td>泊まる</td><td>とまる</td><td>住宿</td><td>泊ま<b>ら</b>ない</td></tr><tr><td>流行る</td><td>はやる</td><td>流行</td><td>流行<b>ら</b>ない</td></tr><tr><td>降る</td><td>ふる</td><td>落(雨)</td><td>降<b>ら</b>ない</td></tr></table>呢幾個要死記！全部ない形都有<b>ら</b>！",
+   jp:"食べる（第2類✅）vs 入る（第1類⚠️）",cn:"同樣〜る結尾，分類唔同！",
+   pit:"",pw:"",pr:""},
+  {nm:"第3類 — 只有兩個",
+   formula:"する → します・しない・した・して\n来（く）る → きます・こない・きた・きて",
+   ex:"する同来る係唯一嘅不規則動詞。好消息：只有兩個pattern要死記。<br><br>注意来る嘅讀音會變：<b>く</b>る → <b>き</b>ます → <b>こ</b>ない → <b>き</b>た → <b>き</b>て。<br><br>する嘅compound超多——全部跟する嘅變化：<br><b>勉強する</b>（讀書）・<b>運動する</b>（做運動）・<b>料理する</b>（煮嘢食）・<b>我慢する</b>（忍耐）・予約する（預約）・掃除する（打掃）・観光する（觀光）<br><br>識する嘅變化 = 識晒所有する compound。",
+   jp:"勉強する → 勉強しない・勉強した・勉強して・勉強できる",cn:"所有～する動詞都跟する變（6個 in drill）",
+   pit:"",pw:"",pr:""}
+ ]
+},
+// === Batch 1: Five-finger ===
+{id:1,nm:"五指口訣 ✋",sub:"あいうえお — 第1類動詞嘅密碼",badge:"✋",bn:"五指徽章",col:"var(--electric)",
+ forms:['_finger'],drillType:'finger',
+ theory:[
+  {nm:"五指 = 五個形",
+   formula:"👆 あ段 → ない形（唔做）\n✌️ い段 → ます形 / たい形（想做）\n🖐 う段 → 辞書形（原形）\n🤟 え段 → 可能形（做到）\n👊 お段 → 意向形（一齊做）",
+   ex:"Miss教你數手指就係呢個！第1類動詞嘅字尾永遠跟住あいうえお五段走。<br><br>用<b>飲む</b>做例：<br>ま(あ段)→ない / み(い段)→ます、たい / む(う段)→辞書 / め(え段)→可能 / も(お段)→意向<br><br>用<b>書く</b>做例：<br>か→き→く→け→こ<br><br>用<b>選ぶ</b>做例：<br>ば→び→ぶ→べ→ぼ<br><br>記住一個字尾嘅五段，就自動識五個形嘅stem。",
+   jp:"飲む → ま・み・む・め・も",cn:"あ(ない)→い(ます)→う(辞書)→え(可能)→お(意向)",
+   pit:"う結尾嘅動詞，あ段唔係あ，係わ",pw:"言う → 言あ(✗)",pr:"言う → 言わ(✓)"},
+  {nm:"第2類同第3類唔使數手指",
+   formula:"第2類：永遠去る，加新尾巴\n食べる → 食べ + ない/た/て/られる/よう/たい\n\n第3類：死記兩組\nする → し/し/し/でき/し/し\n来る → こ/き/き/こられ/こ/き",
+   ex:"五指口訣只用喺第1類。第2類好簡單——字尾嘅「る」去咗，加咩就係咩：食べ+ない、食べ+て、食べ+られる。<br><br>第3類得兩個，變化冇規律但用得多自然記住。",
+   jp:"食べる → 食べ（萬能stem）+ 任何尾巴",cn:"第2類去る就搞掂",
+   pit:"",pw:"",pr:""}
+ ]
+},
+// === Batch 2: ない形 ===
+{id:2,nm:"ない形",sub:"あ段 + ない — 唔做",badge:"🚫",bn:"否定徽章",col:"var(--fire)",
+ forms:['nai'],drillType:'form',
+ theory:[
+  {nm:"ない形（唔做）",
+   formula:"第1類：五指あ段 + ない\n第2類：去る + ない\n第3類：する→しない / 来る→こない",
+   ex:"ない形就係「唔做」。第1類用五指口訣數到あ段：<br><br>飲<b>む</b> → 飲<b>ま</b>ない（む→ま）<br>書<b>く</b> → 書<b>か</b>ない（く→か）<br>話<b>す</b> → 話<b>さ</b>ない（す→さ）<br>待<b>つ</b> → 待<b>た</b>ない（つ→た）<br>選<b>ぶ</b> → 選<b>ば</b>ない（ぶ→ば）<br><br>⚠️ <b>う結尾特殊</b>：唔係あ，係わ！<br>言<b>う</b> → 言<b>わ</b>ない（唔係言あない）<br>会<b>う</b> → 会<b>わ</b>ない",
+   jp:"今日は出かけない",cn:"今日唔出街",
+   pit:"う結尾用あない",pw:"言あない",pr:"言わない"}
+ ]
+},
+// === Batch 3: て形・た形 ===
+{id:3,nm:"て形・た形",sub:"音變口訣 — んで・いて・して・って",badge:"🔗",bn:"連接徽章",col:"var(--water)",
+ forms:['te','ta'],drillType:'form',
+ theory:[
+  {nm:"て形・た形（孖生兄弟）",
+   formula:"む・ぶ・ぬ → んで / んだ\nく → いて / いた（⚠️行く→行って/った）\nぐ → いで / いだ\nす → して / した\nつ・る・う → って / った",
+   ex:"て形同た形嘅轉法<b>完全一樣</b>——淨係結尾唔同（て/で vs た/だ）。<br><br>口訣背呢四組：<br>1️⃣ <b>んで/んだ</b>：む・ぶ・ぬ → 飲<b>んで</b>/飲<b>んだ</b>、選<b>んで</b>/選<b>んだ</b><br>2️⃣ <b>いて/いた</b>：く → 書<b>いて</b>/書<b>いた</b>（ぐ → 泳<b>いで</b>/泳<b>いだ</b>）<br>3️⃣ <b>して/した</b>：す → 話<b>して</b>/話<b>した</b><br>4️⃣ <b>って/った</b>：つ・る・う → 待<b>って</b>/待<b>った</b><br><br>第2類永遠去る加て/た：食べ<b>て</b>/食べ<b>た</b><br>唯一例外：<b>行く→行って/行った</b>（唔係行いて！）",
+   jp:"飲んで・書いて・話して・待って",cn:"四組音變口訣",
+   pit:"行く嘅て形",pw:"行いて",pr:"行って"}
+ ]
+},
+// === Batch 4: 可能形・意向形・たい形 ===
+{id:4,nm:"可能・意向・たい",sub:"え段・お段・い段 — 五指收尾",badge:"⚡",bn:"能力徽章",col:"var(--electric)",
+ forms:['kan','iko','tai'],drillType:'form',
+ theory:[
+  {nm:"可能形（え段 — 做到）",
+   formula:"第1類：え段 + る\n第2類：去る + られる\n第3類：する→できる / 来る→こられる",
+   ex:"五指第四隻——え段加る。<br>飲む→飲<b>め</b>る、書く→書<b>け</b>る、話す→話<b>せ</b>る。<br><br>第2類加られる：食べ<b>られる</b>。口語會省略ら講「食べれる」，但考試要寫完整版。<br><br>⚠️ 重要：可能形之後「を」變「が」。<br>写真<b>を</b>撮る → 写真<b>が</b>撮れる",
+   jp:"日本語が少し話せる",cn:"識講少少日文",
+   pit:"第2類口語省略ら",pw:"食べれる（口語OK，考試✗）",pr:"食べられる"},
+  {nm:"意向形（お段 — 一齊做）",
+   formula:"第1類：お段 + う\n第2類：去る + よう\n第3類：する→しよう / 来る→こよう",
+   ex:"五指第五隻——お段加う。<br>飲む→飲<b>も</b>う、行く→行<b>こ</b>う、話す→話<b>そ</b>う。<br><br>加か變問句：「食べようか？」= 不如食啦？",
+   jp:"一緒に帰ろう",cn:"一齊返屋企啦",
+   pit:"第1類加よう",pw:"行こよう",pr:"行こう"},
+  {nm:"たい形（い段 — 想做）",
+   formula:"第1類：い段 + たい\n第2類：去る + たい\n第3類：する→したい / 来る→きたい",
+   ex:"五指第二隻——い段加たい。<br>飲む→飲<b>み</b>たい、書く→書<b>き</b>たい。<br><br>注意：たい只講自己想做，唔好用嚟講別人。",
+   jp:"しゃぶしゃぶ食べたい！",cn:"想食火鍋！",
+   pit:"用たい講第三者",pw:"彼は行きたい",pr:"彼は行きたがっている"}
+ ]
+},
+// === Batch 5: て形 compounds 1 ===
+{id:5,nm:"て形家族 Part 1",sub:"ている・ていない・てください・てみる",badge:"🌊",bn:"て形徽章",col:"var(--water)",
+ forms:['teiru','teinai','tekuda','temiru'],drillType:'form',
+ theory:[
+  {nm:"重點：你已經識て形",formula:"て形 + 尾巴 = compound形態\n所有compound都係你已經識嘅て形再加嘢",
+   ex:"如果Batch 3你操熟咗て形，呢個batch好簡單——淨係加尾巴：<br><br><b>ている</b> = て形 + いる（做緊 / 已經～咗嘅狀態）<br><b>ていない</b> = て形 + いない（未做 / 冇做）<br><b>てください</b> = て形 + ください（請做～）<br><b>てみる</b> = て形 + みる（試下做～）<br><br>你要做嘅只有一步：變て形。之後加邊個尾巴就係邊個意思。",
+   jp:"食べている・食べていない・食べてください・食べてみる",cn:"全部都係「食べて」+ 尾巴",pit:"",pw:"",pr:""},
+  {nm:"ている — 做緊 / 狀態",formula:"て形 + いる",ex:"兩個意思：<b>進行中</b>（食べている = 食緊）同<b>狀態</b>（覚えている = 記得）。<br><br>最伏：「知る」嘅否定唔用ていない，要用「知らない」。",jp:"今、何してる？",cn:"你而家做緊咩？",pit:"知る嘅否定",pw:"知っていない",pr:"知らない"},
+  {nm:"てください — 請做",formula:"て形 + ください",ex:"禮貌請求。重點係て形音變要啱。",jp:"ちょっと待ってください",cn:"請等一等",pit:"て形音變錯",pw:"書くてください",pr:"書いてください"},
+  {nm:"てみる — 試下做",formula:"て形 + みる",ex:"用喺「未做過嘅嘢想試下」。日日食飯唔會講「食べてみる」。",jp:"着てみたいです",cn:"想試下著",pit:"用辭書形接",pw:"食べるみる",pr:"食べてみる"}
+ ]
+},
+// === Batch 6: て形 compounds 2 ===
+{id:6,nm:"て形家族 Part 2",sub:"ても・てもいい・てはいけない・授受",badge:"💧",bn:"進階て形徽章",col:"var(--ice)",
+ forms:['temo','temoii','tehaik','tekure','teage','temora'],drillType:'form',
+ theory:[
+  {nm:"ても — 就算～都～",formula:"て形 + も",ex:"逆接。「雨が降っても行く」= 就算落雨都去。",jp:"高くても買いたい",cn:"就算貴都想買",pit:"い形直接加ても",pw:"高いても",pr:"高くても"},
+  {nm:"てもいい / てはいけない",formula:"て形 + もいい = 可以\nて形 + はいけない = 唔准",ex:"許可同禁止係一對。口語：ては→ちゃ，「食べちゃだめ」= 唔准食。",jp:"写真を撮ってもいいですか？",cn:"可唔可以影相？",pit:"漏も",pw:"食べていいです",pr:"食べてもいいです"},
+  {nm:"てくれる / てあげる / てもらう",formula:"てくれる = 別人幫我做（感恩）\nてあげる = 我幫人做\nてもらう = 我請人幫我做",ex:"方向好重要：くれる永遠係別人→我，あげる永遠係我→別人。",jp:"友達が送ってくれた",cn:"朋友送咗我",pit:"方向搞錯",pw:"私が友達に送ってくれた",pr:"私が友達を送ってあげた"}
+ ]
+},
+// === Batch 7: た形 compounds ===
+{id:7,nm:"た形家族",sub:"たことがある・たばかり・た後で・たら・たり",badge:"🔥",bn:"た形徽章",col:"var(--fire)",
+ forms:['takoto','takonai','tabaka','taato','tara','tari'],drillType:'form',
+ theory:[
+  {nm:"全部都係た形 + 尾巴",formula:"た形 + ことがある = 做過\nた形 + ばかり = 剛做完\nた形 + 後で = 之後\nた形 + ら = 如果\nた形 + り = 做吓～",
+   ex:"同Batch 5一樣——你識た形就識呢堆。<br><br>最伏：「食べることがある」（辭書形）= 有時會食。「食べたことがある」（た形）= 食過。差一個字意思完全唔同！",
+   jp:"納豆を食べたことがない",cn:"未食過納豆",pit:"辭書形 vs た形",pw:"食べることがある（有時食）",pr:"食べたことがある（食過）"},
+  {nm:"たら — 如果",formula:"た形 + ら",ex:"最萬用嘅「如果」。い形：高かったら。な形/名詞：静かだったら。",jp:"安かったら買う",cn:"如果平就買",pit:"い形加だったら",pw:"高いだったら",pr:"高かったら"},
+  {nm:"たり — 做吓～做吓～",formula:"た形 + り ... た形 + り + する",ex:"列舉（暗示仲有其他）。句尾一定要有する！",jp:"映画を見たり、買い物をしたりする",cn:"睇吓戲、行吓街咁",pit:"漏句尾する",pw:"見たり、したり。",pr:"見たり、したりする"}
+ ]
+},
+// === Batch 8: ない形 compounds ===
+{id:8,nm:"ない形家族",sub:"ないで・ないでください・ないといけない・なくてもいい",badge:"🛡",bn:"ない形徽章",col:"var(--ground)",
+ forms:['naide','naideku','naitoi','nakuii'],drillType:'form',
+ theory:[
+  {nm:"全部都係ない形 + 尾巴",formula:"ない形 + で = 唔做咁～\nない形 + でください = 請唔好\nない形 + といけない = 一定要做\nない形去い + くてもいい = 唔洗做",
+   ex:"識ない形就識呢四個。<br><br>注意「なくてもいい」特殊：ない要去咗い先加くてもいい。<br>飲ま<b>ない</b> → 飲まな<b>くてもいい</b>",
+   jp:"無理しなくてもいい",cn:"唔洗勉強",pit:"ない形接法",pw:"飲むなくてもいい",pr:"飲まなくてもいい"},
+  {nm:"ないといけない — 一定要做",formula:"ない形 + といけない",ex:"直譯：「如果唔做就唔得」= 一定要做。",jp:"明日早く起きないといけない",cn:"聽日一定要早起",pit:"辭書形直接加",pw:"行くないといけない",pr:"行かないといけない"}
+ ]
+},
+// === Batch 9: Remaining ===
+{id:9,nm:"其餘接續",sub:"すぎる・に行く・ために・かもしれない・そう",badge:"⭐",bn:"完成徽章",col:"var(--accent)",
+ forms:['sug','niiku','tame','kamo','sou'],drillType:'form',
+ theory:[
+  {nm:"い段接續（ます形stem）",formula:"い段 + すぎる = 太過\nい段 + に行く = 去做\nい段 + そう = 睇落好似",
+   ex:"呢三個都用い段（= ます形去ます）接：<br>飲<b>み</b>すぎる、食べ<b>に</b>行く、降<b>り</b>そう<br><br>い形容詞嘅すぎる/そう要去い：おいし<b>すぎる</b>（唔係おいしいすぎる）",
+   jp:"昨日、飲みすぎた",cn:"昨日飲太多",pit:"い形保留い",pw:"おいしいすぎる",pr:"おいしすぎる"},
+  {nm:"辞書形接續",formula:"辞書形 + ために = 為咗\n辞書形 + かもしれない = 可能",
+   ex:"呢兩個用辞書形（原形）直接接：<br>日本に行く<b>ために</b>貯金する = 為咗去日本而儲錢<br>雨が降る<b>かもしれない</b> = 可能會落雨",
+   jp:"試験に受かるために、毎日勉強する",cn:"為咗考試合格，每日溫書",pit:"",pw:"",pr:""}
+ ]
+}
+];
+
+// ===== PROGRESS =====
+const SK='jpn-v3';
+function lp(){try{return JSON.parse(localStorage.getItem(SK))||{b:{},c:0}}catch{return{b:{},c:0}}}
+function sp(p){localStorage.setItem(SK,JSON.stringify(p))}
+function bs(id){const p=lp();if(p.b[id]?.d)return'done';if(id<=p.c)return'cur';return'lock'}
+function tb(){return Object.values(lp().b).filter(x=>x.d).length}
+
+// ===== MAP =====
+function renderMap(){
+  const p=lp(),bd=tb();
+  document.getElementById('tbd').textContent=bd;
+  document.getElementById('tlv').textContent=bd+1;
+  document.getElementById('txp').style.width=(bd/B.length*100)+'%';
+  document.getElementById('bdg').innerHTML=B.map(b=>`<div class="mb ${p.b[b.id]?.d?'on':'off'}" style="background:${p.b[b.id]?.d?b.col:'var(--locked)'}">${b.badge}</div>`).join('');
+
+  const phases=[{label:'Phase A: 基礎動詞變形',start:0,end:4},{label:'Phase B: て形 Compounds',start:5,end:6},{label:'Phase C: た形 Compounds',start:7,end:7},{label:'Phase D: ない形 Compounds',start:8,end:8},{label:'Phase E: 其餘',start:9,end:9}];
+  let html='';
+  phases.forEach(ph=>{
+    html+=`<div class="phase-label">${ph.label}</div><div class="route">`;
+    for(let i=ph.start;i<=ph.end;i++){
+      const b=B[i],st=bs(i),prog=p.b[i]?.score||0;
+      html+=`<div class="node" onclick="${st!=='lock'?`openB(${i})`:''}"><div class="dot ${st}">${st==='done'?'✓':st==='cur'?'!':'🔒'}</div><div class="sc ${st}"><div class="sn">Batch ${i}</div><div class="st">${b.badge} ${b.nm}</div><div class="ss">${b.sub}</div><div class="sp"><div class="spf" style="width:${st==='done'?100:Math.min(prog*5,95)}%;background:${st==='done'?'var(--grass)':b.col}"></div></div></div></div>`;
+    }
+    html+=`</div>`;
+  });
+  document.getElementById('rt').innerHTML=html;
+}
+
+// ===== STAGE =====
+let cb=null,cs=0,ds={};
+function openB(i){
+  cb=B[i];cs=0;
+  // Balanced sampling: ensure all 3 types are well represented
+  const v1=sh(V.filter(x=>x.c===1)).slice(0,8);
+  const v2=sh(V.filter(x=>x.c===2)).slice(0,6);
+  const v3=sh(V.filter(x=>x.c===3)).slice(0,4);
+  ds={ans:{},sc:0,vi:0,vs:sh([...v1,...v2,...v3])};
+  document.getElementById('map').style.display='none';
+  document.getElementById('stg').style.display='block';
+  document.getElementById('stitle').textContent=`Batch ${i}: ${cb.nm}`;
+  document.getElementById('stitle').style.color=cb.col;
+  rTabs();rStep();window.scrollTo(0,0);
+}
+function goMap(){document.getElementById('map').style.display='block';document.getElementById('stg').style.display='none';renderMap();window.scrollTo(0,0)}
+function rTabs(){document.getElementById('stabs').innerHTML=['理論','操練','通關'].map((s,i)=>`<button class="tab ${i===cs?'act':i<cs?'dn':''}" onclick="sw(${i})">${s}</button>`).join('')}
+function sw(i){
+  if(i===2){const needed=cb.drillType==='classify'?ds.vs.length*2:cb.drillType==='finger'?ds.vs.filter(v=>v.c===1).length*5:cb.forms.length*ds.vs.length;if(Object.keys(ds.ans).filter(k=>!k.endsWith('_pick')).length<needed)return;}
+  cs=i;rTabs();rStep();window.scrollTo(0,0);
+}
+function rStep(){const e=document.getElementById('scont');if(cs===0)rTheory(e);else if(cs===1)rDrill(e);else rGate(e)}
+
+// Theory
+function rTheory(e){
+  e.innerHTML=cb.theory.map(t=>`<div class="card"><div style="font-size:18px;font-weight:700;margin-bottom:4px">${t.nm}</div><div class="formula">${t.formula.replace(/\n/g,'<br>')}</div><div class="expl">${t.ex}</div><div class="eg"><div class="jp">${t.jp}</div><div class="cn">${t.cn}</div></div>${t.pit?`<div class="pit"><div class="pit-l">PITFALL</div><div>${t.pit}</div><div class="pit-r"><div class="pit-w">✗ ${t.pw}</div><div class="pit-c">✓ ${t.pr}</div></div></div>`:''}</div>`).join('')+`<button class="btn" style="width:100%;margin-top:16px" onclick="sw(1)">去操練 →</button>`;
+}
+
+// Drill dispatcher
+function rDrill(e){
+  if(cb.drillType==='classify'){
+    if(ds.vi<ds.vs.length)rDrillCls(e);
+    else rDrillReading(e);
+  }
+  else if(cb.drillType==='finger')rDrillFinger(e);
+  else rDrillForm(e);
+}
+
+// Reading drill: see kanji, pick the correct reading
+function rDrillReading(e){
+  const ri=ds.vi-ds.vs.length;
+  const rv=ds.vs[ri%ds.vs.length];
+  const key=ds.vi+'_rd';
+  const answered=ds.ans[key]!==undefined;
+  const isCorrect=ds.ans[key]==='correct';
+  const others=V.filter(x=>x.r!==rv.r);
+  const wrongs=new Set();
+  let t=0;
+  while(wrongs.size<3&&t<50){wrongs.add(others[Math.floor(Math.random()*others.length)].r);t++;}
+  wrongs.delete(rv.r);
+  const opts=sh([rv.r,...[...wrongs].slice(0,3)]);
+  let html='<div class="dv"><div class="pf" style="font-size:11px;color:var(--dim)">讀音 '+(ri+1)+' / '+ds.vs.length+'</div>';
+  html+='<div class="dk">'+rv.k+'</div>';
+  html+='<div class="di" style="color:var(--psychic)">'+rv.m+'</div>';
+  html+='<div class="ds">得分：'+ds.sc+' / '+Object.keys(ds.ans).filter(function(k){return !k.endsWith("_pick")}).length+'</div></div>';
+  html+='<div class="card dq"><div class="dql" style="color:var(--psychic)">🔊 呢個動詞點讀？</div><div class="do">';
+  opts.forEach(function(o){
+    var cls='';
+    if(answered){if(o===rv.r)cls='ok';else if(ds.ans[key+'_pick']===o&&o!==rv.r)cls='no';}
+    html+='<button class="dob '+cls+'" '+(answered?'disabled':'')+' onclick="ansRd(\''+o.replace(/'/g,"\\'")+'\',\''+rv.r.replace(/'/g,"\\'")+'\')">'+o+'</button>';
+  });
+  html+='</div>';
+  if(answered){html+='<div class="dfb show '+(isCorrect?'fbok':'fbno')+'">'+(isCorrect?'✓ 正確！':'✗ 錯咗！')+rv.k+'（'+rv.r+'）= '+rv.m+'</div>';}
+  html+='</div><div style="margin-top:16px;display:flex;gap:8px">';
+  if(ds.vi>0)html+='<button class="btn btn-g" style="flex:1" onclick="ds.vi--;rDrill(document.getElementById(\'scont\'))">←</button>';
+  if(answered){
+    if(ri<ds.vs.length-1)html+='<button class="btn" style="flex:1" onclick="ds.vi++;rDrill(document.getElementById(\'scont\'));window.scrollTo(0,0)">下一個 →</button>';
+    else html+='<button class="btn" style="flex:1" onclick="sw(2)">睇成績 →</button>';
+  }else{html+='<button class="btn" style="flex:1;opacity:.3" disabled>答咗先繼續</button>';}
+  html+='</div>';
+  e.innerHTML=html;
+}
+function ansRd(chosen,correct){
+  var key=ds.vi+'_rd';
+  if(ds.ans[key]!==undefined)return;
+  ds.ans[key]=chosen===correct?'correct':'wrong';
+  ds.ans[key+'_pick']=chosen;
+  if(chosen===correct)ds.sc++;
+  var p=lp();if(!p.b[cb.id])p.b[cb.id]={};p.b[cb.id].score=(p.b[cb.id].score||0)+1;sp(p);
+  rDrill(document.getElementById('scont'));
+}
+
+// Batch 0: Classification drill
+function rDrillCls(e){
+  const v=ds.vs[ds.vi];
+  const key=ds.vi+'_cls';
+  const answered=ds.ans[key]!==undefined;
+  const isCorrect=ds.ans[key]==='correct';
+  e.innerHTML=`<div class="dv"><div class="pf" style="font-size:11px;color:var(--dim)">${ds.vi+1} / ${ds.vs.length}</div><div class="dk">${v.k}</div><div class="di">${v.r} · ${v.m}</div><div class="ds">得分：${ds.sc} / ${Object.keys(ds.ans).length}</div></div>
+  <div class="card dq"><div class="dql">呢個動詞係第幾類？</div><div class="do" style="grid-template-columns:1fr 1fr 1fr">${[1,2,3].map(c=>{
+    let cls='';
+    if(answered){if(c===v.c)cls='ok';else if(ds.ans[key+'_pick']===c&&c!==v.c)cls='no';}
+    return`<button class="dob ${cls}" ${answered?'disabled':''} onclick="ansCls(${c})">${CLS_SHORT[c]}</button>`;
+  }).join('')}</div>
+  ${answered?`<div class="dfb show ${isCorrect?'fbok':'fbno'}">${isCorrect?'✓ 正確！':'✗ 錯咗！'}${v.k}（${v.r}）係<b>${CLS_SHORT[v.c]}</b>${v.c===1&&v.r.endsWith('る')?'<br>⚠️ 呢個係陷阱動詞——る結尾但係第1類！':''}</div>`:''}</div>
+  <div style="margin-top:16px;display:flex;gap:8px">
+  ${ds.vi>0?`<button class="btn btn-g" style="flex:1" onclick="ds.vi--;rDrill(document.getElementById('scont'))">←</button>`:''}
+  ${answered?(ds.vi<ds.vs.length-1?`<button class="btn" style="flex:1" onclick="ds.vi++;rDrill(document.getElementById('scont'));window.scrollTo(0,0)">下一個 →</button>`:`<button class="btn" style="flex:1;background:var(--psychic)" onclick="ds.vi=Math.ceil(ds.vs.length);rDrill(document.getElementById('scont'));window.scrollTo(0,0)">🔊 讀音挑戰 →</button>`):`<button class="btn" style="flex:1;opacity:.3" disabled>答咗先繼續</button>`}
+  </div>`;
+}
+function ansCls(c){
+  const key=ds.vi+'_cls';
+  if(ds.ans[key]!==undefined)return;
+  ds.ans[key]=c===ds.vs[ds.vi].c?'correct':'wrong';
+  ds.ans[key+'_pick']=c;
+  if(c===ds.vs[ds.vi].c)ds.sc++;
+  const p=lp();if(!p.b[cb.id])p.b[cb.id]={};p.b[cb.id].score=(p.b[cb.id].score||0)+1;sp(p);
+  rDrill(document.getElementById('scont'));
+}
+
+// Batch 1: Five-finger drill
+function rDrillFinger(e){
+  const c1=ds.vs.filter(v=>v.c===1);
+  if(c1.length===0){e.innerHTML='<div class="card">呢組冇第1類動詞，再試一次。</div>';return;}
+  const rowNames=['あ段','い段','う段','え段','お段'];
+  const rowKeys=['a','i','u','e','o'];
+  const vi=Math.floor(ds.vi/5);
+  const ri=ds.vi%5;
+  if(vi>=c1.length){sw(2);return;}
+  const v=c1[vi];
+  const fr=fiveRows(v);
+  if(!fr){ds.vi++;rDrill(e);return;}
+  const key=ds.vi+'_f';
+  const answered=ds.ans[key]!==undefined;
+  const correct=fr[rowKeys[ri]];
+
+  // Generate options
+  const allC1=V.filter(x=>x.c===1&&x.k!==v.k);
+  const wrongs=new Set();
+  let tries=0;
+  while(wrongs.size<3&&tries<30){const rv=allC1[Math.floor(Math.random()*allC1.length)];const rfr=fiveRows(rv);if(rfr){const w=rfr[rowKeys[ri]];if(w&&w!==correct)wrongs.add(w);}tries++;}
+  const opts=sh([correct,...wrongs]);
+
+  e.innerHTML=`<div class="dv"><div class="pf" style="font-size:11px;color:var(--dim)">${ds.vi+1} / ${c1.length*5}</div><div class="dk">${v.k}</div><div class="di">${v.r} · ${v.m} · 第1類</div><div class="ds">得分：${ds.sc} / ${Object.keys(ds.ans).length}</div></div>
+  <div class="card dq"><div class="dql" style="font-size:14px">「${v.r}」嘅 <b style="color:var(--accent)">${rowNames[ri]}</b> 係？</div>
+  <div class="do">${opts.map(o=>{
+    let cls='';if(answered){if(o===correct)cls='ok';else if(ds.ans[key+'_pick']===o&&o!==correct)cls='no';}
+    return`<button class="dob ${cls}" ${answered?'disabled':''} onclick="ansFinger('${o.replace(/'/g,"\\'")}','${correct.replace(/'/g,"\\'")}')">${o}</button>`;
+  }).join('')}</div>
+  ${answered?`<div class="dfb show ${ds.ans[key]==='correct'?'fbok':'fbno'}">${fr.a}(あ) → ${fr.i}(い) → ${fr.u}(う) → ${fr.e}(え) → ${fr.o}(お)</div>`:''}</div>
+  <div style="margin-top:16px;display:flex;gap:8px">
+  ${ds.vi>0?`<button class="btn btn-g" style="flex:1" onclick="ds.vi--;rDrill(document.getElementById('scont'))">←</button>`:''}
+  ${answered?(ds.vi<c1.length*5-1?`<button class="btn" style="flex:1" onclick="ds.vi++;rDrill(document.getElementById('scont'));window.scrollTo(0,0)">下一個 →</button>`:`<button class="btn" style="flex:1" onclick="sw(2)">睇成績 →</button>`):`<button class="btn" style="flex:1;opacity:.3" disabled>答咗先繼續</button>`}
+  </div>`;
+}
+function ansFinger(chosen,correct){
+  const key=ds.vi+'_f';
+  if(ds.ans[key]!==undefined)return;
+  ds.ans[key]=chosen===correct?'correct':'wrong';
+  ds.ans[key+'_pick']=chosen;
+  if(chosen===correct)ds.sc++;
+  const p=lp();if(!p.b[cb.id])p.b[cb.id]={};p.b[cb.id].score=(p.b[cb.id].score||0)+1;sp(p);
+  rDrill(document.getElementById('scont'));
+}
+
+// Batch 2-9: Form drill
+function rDrillForm(e){
+  const v=ds.vs[ds.vi];
+  const forms=cj(v);
+  const bf=cb.forms;
+  e.innerHTML=`<div class="dv"><div class="pf" style="font-size:11px;color:var(--dim)">${ds.vi+1} / ${ds.vs.length}</div><div class="dk">${v.k}</div><div class="di">${v.r} · ${v.m} · ${CLS_SHORT[v.c]}</div><div class="ds">得分：${ds.sc} / ${Object.keys(ds.ans).length}</div></div>
+  <div class="dg">${bf.map(f=>{
+    const key=ds.vi+'_'+f;
+    const ans=forms[f];
+    const fl=FL[f];
+    const answered=ds.ans[key]!==undefined;
+    if(answered){
+      const ok=ds.ans[key]==='correct';
+      return`<div class="card" style="border:1px solid ${ok?'var(--grass)':'var(--fire)'};padding:12px"><div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:${ok?'var(--grass)':'var(--fire)'}">${fl.j} (${fl.c})</span><span style="color:${ok?'var(--grass)':'var(--fire)'}">${ok?'✓':'✗'}</span></div><div class="da">${ans}</div></div>`;
+    }
+    const wrongs=gw(v,f,ans);
+    const opts=sh([ans,...wrongs]);
+    return`<div class="card dq"><div class="dql">${fl.j} (${fl.c})</div><div class="do">${opts.map(o=>`<button class="dob" onclick="ansF('${f}',${JSON.stringify(ans)},${JSON.stringify(o)})">${o}</button>`).join('')}</div></div>`;
+  }).join('')}</div>
+  <div style="margin-top:16px;display:flex;gap:8px">
+  ${ds.vi>0?`<button class="btn btn-g" style="flex:1" onclick="ds.vi--;rDrillForm(document.getElementById('scont'))">←</button>`:''}
+  ${bf.every(f=>ds.ans[ds.vi+'_'+f])?(ds.vi<ds.vs.length-1?`<button class="btn" style="flex:1" onclick="ds.vi++;rDrillForm(document.getElementById('scont'));window.scrollTo(0,0)">下一個 →</button>`:`<button class="btn" style="flex:1" onclick="sw(2)">睇成績 →</button>`):`<button class="btn" style="flex:1;opacity:.3" disabled>答完先繼續</button>`}
+  </div>`;
+}
+function gw(v,f,correct){
+  const w=new Set();const oth=V.filter(x=>x.k!==v.k);let t=0;
+  while(w.size<3&&t<50){const rv=oth[Math.floor(Math.random()*oth.length)];const x=cj(rv)[f];if(x&&x!==correct)w.add(x);t++;}
+  return[...w];
+}
+function ansF(f,correct,chosen){
+  const key=ds.vi+'_'+f;
+  if(ds.ans[key])return;
+  ds.ans[key]=chosen===correct?'correct':'wrong';
+  if(chosen===correct)ds.sc++;
+  const p=lp();if(!p.b[cb.id])p.b[cb.id]={};p.b[cb.id].score=(p.b[cb.id].score||0)+1;sp(p);
+  rDrillForm(document.getElementById('scont'));
+}
+
+// Gate
+function rGate(e){
+  const t=Object.keys(ds.ans).filter(k=>!k.endsWith('_pick')).length;
+  const s=ds.sc,pct=Math.round(s/t*100);
+  const pass=cb.id===0?pct>=90:pct>=60;
+  const p=lp(),already=p.b[cb.id]?.d;
+  e.innerHTML=`<div class="gate"><div class="gi">${pass?cb.badge:'🔒'}</div><div class="gt">${pass?'BATCH CLEAR!':'TRY AGAIN'}</div><div class="gs">${s} / ${t} (${pct}%)</div><div style="font-size:13px;color:var(--dim);margin-bottom:16px">${pass?(already?'你已經攞咗呢個徽章！':'恭喜！你獲得了'+cb.bn+'！'):(cb.id===0?'分類要90%先通關——返去溫理論再嚟！':'要答啱60%先通關。返去溫理論再嚟！')}</div>${pass&&!already?`<button class="btn" onclick="claim(${cb.id})">攞取徽章！</button>`:''}${pass&&already?`<button class="btn" onclick="goMap()">返回地圖</button>`:''}${!pass?`<div style="display:flex;gap:8px;justify-content:center"><button class="btn" onclick="retry()">再嚟過</button><button class="btn btn-g" onclick="sw(0)">返去溫理論</button></div>`:''}</div>`;
+}
+function retry(){ds={ans:{},sc:0,vi:0,vs:sh([...V]).slice(0,10)};sw(1)}
+function claim(id){const p=lp();if(!p.b[id])p.b[id]={};p.b[id].d=true;p.b[id].dt=new Date().toISOString().slice(0,10);if(id>=p.c)p.c=id+1;sp(p);document.getElementById('boi').textContent=cb.badge;document.getElementById('bon').textContent=cb.bn;document.getElementById('bov').classList.add('show')}
+function dov(){document.getElementById('bov').classList.remove('show');goMap()}
+function sh(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a}
+
+renderMap();
+</script>
+</body>
+</html>
